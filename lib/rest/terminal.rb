@@ -39,11 +39,11 @@ module Rest
           require 'rest/terminal/commands_info'
           puts ("="*65).yellow
           commands.sort.each do |x|
-            help_line = "#{x}_line"
-            puts "  #{x.ljust(10)}#{send(help_line)}"
+            help_line = send("#{x}_line")
+            puts "  #{x.ljust(10)}#{help_line}"
           end
           puts ("-"*65).yellow
-          puts "for detail explanation on each command"
+          puts "for detail explanation on each commands"
           puts "type: #{'rest help xxx'.green} #xxx: command to know"
         else
           invalid_command

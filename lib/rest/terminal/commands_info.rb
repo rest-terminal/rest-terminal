@@ -15,6 +15,10 @@ module Rest
         "change current service"
       end
 
+      def help_line
+        "detail help information"
+      end
+
       def headers_line
         "view or set var: headers"
       end
@@ -79,6 +83,11 @@ module Rest
         "Ex: rest headers # show it\n".intense_green +
         "    rest headers timeout=15\n".intense_green +
         "use rest info to know all"
+      end
+
+      def help_help
+        "view command information\n"
+        "Ex: rest help add cd info".intense_green
       end
 
       def history_help
