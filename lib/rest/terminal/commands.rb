@@ -49,7 +49,7 @@ module Rest
       def _cd
         fp = full_path(@prm[0])
         if File.directory?("services#{fp}")
-          @pwd = fp
+          @cpath = @pwd = fp
         else
           fp = "Service not exists! #{fp}".red
         end
@@ -76,7 +76,7 @@ module Rest
       def _ls
         path = Dir["#{current_path}*/"]
         path.collect do |x|
-          puts x.sub(current_path,'/')
+          puts x.sub(current_path,'').sub(/\/$/,'')
         end
         @_status = "#{path.length} services"
         # p "lolllll >>#{@serv}<< ."
@@ -89,32 +89,33 @@ module Rest
       def _info
         multi_exec(:_info)
         @_status = ""
-        # @_status = @services[@pwd]._info(@prm)
+        # @_status = @services[@cpath]._info(@prm)
       end
 
       def _response
-        @_status = @services[@pwd]._response(@prm)
+        @_status = @services[@capth]._response(@prm)
       end
 
       def _headers
-        @_status = @services[@pwd]._headers(@prm)
+        @_status = @services[@cpath]._headers(@prm)
       end
 
       def _body
-        @_status = @services[@pwd]._body(@prm)
+        @_status = @services[@cpath]._body(@prm)
       end
 
       def _vars
+        # p "CPATH: >>#{@cpath}<<"
         if @prm.length>1 && !@prm[/\=/]
           pth = @prm.shift
           @_status = @services[pth]._vars(@prm)
         else
-          @_status = @services[@pwd]._vars(@prm)
+          @_status = @services[@cpath]._vars(@prm)
         end
       end
 
       def _reset
-        @_status = @services[@pwd]._reset(@prm)
+        @_status = @services[@cpath]._reset(@prm)
       end
 
       def _send

@@ -15,8 +15,10 @@ module Rest
         end
         pr = @services[@pwd]
         path = Dir["#{current_path}*/"]
+        # p "CHILDPATH #{path.inspect}  >>#{current_path}*/<<"
         path.collect do |px|
           p2 = px[/\/.*/]
+          # p "CHILD #{p2}"
           @services[p2] = ServiceBase.new(pr,p2)
         end
       end

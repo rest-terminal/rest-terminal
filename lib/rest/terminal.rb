@@ -23,6 +23,7 @@ module Rest
         @prm      = [ ]
         @pwd      = '/'
         @cmd      = ''
+        @cpath    = ''
         @_status  = ''
       end
 
@@ -53,16 +54,23 @@ module Rest
       def load_state
         if File.exists?('./.rest-terminal/persistent_rc.rb')
           require './.rest-terminal/persistent_rc'
-          load_vars
+          load_vars 
+          @cpath = @capth ? "#{@pwd}#{@cpath}/" : @pwd
           load_services
         end
       end
 
+      # sometime command can include the child service 
+      # Ex: rest vars@child
+      # old code for this action use @pwd as current service path
+      # new code for this action introduce @cpath as current path
       def is_cmd_in_commands?
         puts ARGV.inspect.red
-        @cmd = ARGV[0].to_s
-        parm = ARGV[1,99]
-        @prm = parm ? parm : [ ] #.join(' ') : ''
+        cmdp   = ARGV[0].to_s.split('@')
+        parm   = ARGV[1,99]
+        @cmd   = cmdp[0]
+        @cpath = cmdp[1]
+        @prm   = parm ? parm : [ ] #.join(' ') : ''
         commands.index(@cmd) ? @cmd : nil
         # if singleton_class.private_instance_methods(false).index(@@cmd.to_sym) 
       end
@@ -94,11 +102,11 @@ module Rest
       end
 
       def space_path(spc)
-        (spc[0] == '/')  ? spc : "#{@pwd}#{spc}"
+        (spc[0] == '/')  ? spc : "#{@cpath}#{spc}"
       end
 
       def full_path(spc)
-        x = "#{@pwd} "
+        x = "#{@cpath} "
         l = x.count('/')+1
         dots = spc[/\.+/]
         if dots && 
@@ -114,9 +122,10 @@ module Rest
       def multi_exec(cmd)
         @prm = ['.'] if @prm==[]
         @prm.each do |prm|
-          prm = @pwd if prm=='.'
+          prm = @cpath if prm=='.'
           pth = full_path(prm)
           puts "Service: #{pth}".yellow
+          # puts @services.keys.inspect
           @_status = @services[pth].send(cmd,prm)
         end
       end
