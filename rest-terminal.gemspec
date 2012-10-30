@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 	s.version    = Rest::Version
 	s.author     = ["WHarsojo"]
 	s.email      = ["wharsojo@gmail.com"]
-	s.homepage   = "http://github.com/wharsojo"
+	s.homepage   = "http://github.com/rest-terminal"
 	s.summary    = %q{Rest API Test on Terminal}
 
 	s.rubyforge_project = "rest-terminal"

@@ -23,7 +23,7 @@ module Rest
 
       # :nodoc:
       def patch
-      4
+      5
       end
 
       # :nodoc:

@@ -89,7 +89,7 @@ class ServiceBase
       Rest::Terminal.instance_variable_set("@response",@response)
       puts line.red
       puts "response".intense_green 
-      puts @response #.pj #[:response_headers].inspect
+      puts @response.pj #[:response_headers].inspect
       save_vars
       ""
     rescue Faraday::Error::ConnectionFailed => e
