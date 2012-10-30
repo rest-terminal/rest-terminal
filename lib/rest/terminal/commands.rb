@@ -14,18 +14,18 @@ module Rest
 
       def _init
         require 'fileutils'
-        pth = "#{File.dirname(__FILE__)}/.."
+        src = "#{File.dirname(__FILE__)}/.."
         FileUtils.mkdir_p ".rest-terminal"
-        `cp #{pth}/terminal/persistent_rc.rb .rest-terminal`
+        `cp #{src}/terminal/persistent_rc.rb .rest-terminal`
         require './.rest-terminal/persistent_rc'
         load_vars
         FileUtils.mkdir_p "services"
-        `cp #{pth}/service.rb services`
+        `cp #{src}/service.rb services`
         @spaces.each do |path|
           # `mkdir -p services#{path}`
           FileUtils.mkdir_p "services#{path}"
           #`cp ./service.rb services#{path}`
-          `cp #{pth}/service.rb services#{path}`
+          `cp #{src}/service.rb services#{path}`
         end
         @hist   = ['init']
         @pwd    = '/'
@@ -38,8 +38,9 @@ module Rest
           if File.directory?("services#{fp}")
             fp = "Service already exists! #{fp}".red
           else
+            src = "#{File.dirname(__FILE__)}/.."
             FileUtils.mkdir_p("services#{fp}")
-            `cp ./service.rb services#{fp}`
+            `cp #{src}/service.rb services#{fp}`
           end
         end
         @_status = "#{@prm.length} service created!"

@@ -155,9 +155,14 @@ class ServiceBase
   end
 
   def body_join
-    bodies.collect do |k,v|
-      "#{k}=#{v}"
-    end.join("&")
+    if headers[:"content-type"]=='application/json'
+      body = bodies.to_json
+    else
+      body = bodies.collect do |k,v|
+        "#{k}=#{v}"
+      end.join("&")
+    end
+    body
   end
 
   def set_value(key,prm)
