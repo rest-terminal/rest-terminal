@@ -34,6 +34,7 @@ module Rest
         b << "@pwd  = #{@pwd.inspect}"
         b << "@serv = #{@serv.inspect}"
         b << "@hist = #{@hist.inspect}"
+        b << "@service = #{@service.inspect}"
         b << "@response = #{@response.inspect}"
         c = b.join("\n        ")
         s = "#env_start(.*)#env_end" 

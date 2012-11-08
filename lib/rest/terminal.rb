@@ -16,6 +16,7 @@ module Rest
         @repl     = ''
         @type     = 'earth'
         @serv     = 'localhost'
+        @service  = ''
         @services = { }
         @response = { }
         @spaces   = [ ]
@@ -126,7 +127,9 @@ module Rest
           pth = full_path(prm)
           puts "Service: #{pth}".yellow
           # puts @services.keys.inspect
-          @_status = @services[pth].send(cmd,prm)
+          svc = @services[pth]
+          svc.load_service
+          @_status = svc.send(cmd,prm)
         end
       end
 

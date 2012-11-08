@@ -8,19 +8,23 @@ class ServiceBase
     @response = {}
     @parent   = vc 
     reset(%w(headers body vars))
+    load_service
+  end
+
+  def load_service
+    # p "services#{path}service.rb"
     if File.exists?("services#{path}service.rb")
       instance_eval(IO.read("services#{path}service.rb"))
     end
   end
 
   def _info(prm)
-    headerx = headers
-    bodyx = bodies
-    varx = vars
+    headerx = headers.select{|k,v|v!=""}
+    bodyx = bodies.select{|k,v|v!=""}
+    varx = vars.select{|k,v|v!=""}
     line = ('-'*65)
 
     puts ('='*65).yellow
-    # puts "[#{varx[:conn]}] #{varx[:url]}".intense_blue
     puts line.blue
     puts "headers".intense_green 
     puts headerx.pj
@@ -59,10 +63,9 @@ class ServiceBase
   end
 
   def _send(prm)
-    #p Rest::Terminal.instance_variable_get("@response")
-    headerx = headers
-    bodyx = bodies
-    varx = vars
+    headerx = headers.select{|k,v|v!=""}
+    bodyx = bodies.select{|k,v|v!=""}
+    varx = vars.select{|k,v|v!=""}
     line = ('-'*65)
 
     puts line.yellow
@@ -76,7 +79,8 @@ class ServiceBase
         req.body = body_join 
         req.headers = headerx
       end.env
-      if /application\/json/=~resp[:response_headers]["content-type"]
+      ct = resp[:response_headers]["content-type"]
+      if ct && /application\/json/=~ct.downcase
         body = JSON.parse(resp[:body])
       else
         body = resp[:body]
@@ -86,10 +90,11 @@ class ServiceBase
         :headers => resp[:response_headers],
         :body => body
       }
+      Rest::Terminal.instance_variable_set("@service",@path)
       Rest::Terminal.instance_variable_set("@response",@response)
       puts line.red
       puts "response".intense_green 
-      puts @response.pj #[:response_headers].inspect
+      puts @response.pj
       save_vars
       ""
     rescue Faraday::Error::ConnectionFailed => e
@@ -99,15 +104,15 @@ class ServiceBase
   end
 
   def headers(up=true)
-    inheritances(:headers,up).select{|k,v|v && !v.empty?}
+    inheritances(:headers,up).select{|k,v|v} 
   end
 
   def bodies(up=true)
-    inheritances(:bodies,up).select{|k,v|v && !v.empty?}
+    inheritances(:bodies,up).select{|k,v|v} 
   end
 
   def vars(up=true)
-    inheritances(:vars,up).select{|k,v|v && !v.empty?}
+    inheritances(:vars,up).select{|k,v|v} 
   end
 
   def inheritances(key,up)
@@ -122,8 +127,17 @@ class ServiceBase
   end
 
   private
-  # ex: rest reset body
-  # reset value to def_value or empty/[]  
+
+  def last_service
+    t = Rest::Terminal
+    s = t.instance_variable_get("@service")
+    t.instance_variable_get("@services")[s]
+  end
+
+  def last_response
+    Rest::Terminal.instance_variable_get("@response")
+  end
+
   def reset(prm)
     params = prm - (prm - %w(headers body vars))
     params.each do |x|
@@ -155,7 +169,8 @@ class ServiceBase
   end
 
   def body_join
-    if headers[:"content-type"]=='application/json'
+    ct = headers[:"content-type"]
+    if ct && /application\/json/=~ct.downcase
       body = bodies.to_json
     else
       body = bodies.collect do |k,v|
